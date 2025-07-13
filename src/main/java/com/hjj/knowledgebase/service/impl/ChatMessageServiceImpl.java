@@ -118,7 +118,7 @@ public class ChatMessageServiceImpl extends ServiceImpl<ChatMessageMapper, ChatM
     public Flux<ChatMessageVo> rag(String question, Long conversationId, HttpServletRequest request) {
         if (conversationId == null || conversationId == 0) {
             conversationId = chatConversationService.add(ChatConversationDto
-                    .builder().name(question).build(), request);
+                    .builder().name(question).build());
         }
         return ragService.queryFromEsRag(question, conversationId);
     }

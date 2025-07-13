@@ -1,5 +1,6 @@
 package com.hjj.knowledgebase.controller;
 
+import cn.dev33.satoken.stp.StpUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.hjj.knowledgebase.annotation.AuthCheck;
@@ -22,6 +23,7 @@ import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.annotation.Resource;
+
 import java.util.List;
 
 import static com.hjj.knowledgebase.service.impl.UserServiceImpl.SALT;
@@ -82,18 +84,12 @@ public class UserController {
     }
 
     /**
-     * 用户注销
-     *
-     * @param request
-     * @return
+     * 用户退出登录
      */
     @PostMapping("/logout")
-    public BaseResponse<Boolean> userLogout(HttpServletRequest request) {
-        if (request == null) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-        }
-        boolean result = userService.userLogout(request);
-        return ResultUtils.success(result);
+    public BaseResponse<Boolean> userLogout() {
+        StpUtil.logout();
+        return ResultUtils.success(true);
     }
 
     /**

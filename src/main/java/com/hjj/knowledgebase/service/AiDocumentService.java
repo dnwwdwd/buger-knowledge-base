@@ -2,6 +2,8 @@ package com.hjj.knowledgebase.service;
 
 import com.hjj.knowledgebase.model.entity.AiDocument;
 import com.baomidou.mybatisplus.extension.service.IService;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
 * @author hejiajun
@@ -10,4 +12,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface AiDocumentService extends IService<AiDocument> {
 
+    Boolean upload(MultipartFile file, HttpServletRequest request);
+
+    Boolean delete(Long id);
 }

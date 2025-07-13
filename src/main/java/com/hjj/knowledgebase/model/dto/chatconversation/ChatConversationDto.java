@@ -13,6 +13,8 @@ import java.io.Serializable;
 @Builder
 public class ChatConversationDto implements Serializable {
 
+    private Long id;
+
     private String name;
 
 }

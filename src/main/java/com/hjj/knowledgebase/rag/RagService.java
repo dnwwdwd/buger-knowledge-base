@@ -4,6 +4,7 @@ import com.hjj.knowledgebase.chatmemory.MySQLChatMemory;
 import com.hjj.knowledgebase.model.vo.ChatMessageVo;
 import com.hjj.knowledgebase.service.AiDocumentService;
 import jakarta.annotation.Resource;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.RetrievalAugmentationAdvisor;
@@ -15,6 +16,8 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
 import java.util.List;
+
+import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY;
 
 @Service
 public class RagService {
@@ -44,7 +47,7 @@ public class RagService {
         return chatClient.prompt()
                 .user(question)
                 .advisors(advisor, new MessageChatMemoryAdvisor(mySQLChatMemory))
-                .advisors(advisorSpec -> advisorSpec.param("conversationId", conversationId))
+                .advisors(advisorSpec -> advisorSpec.param(CHAT_MEMORY_CONVERSATION_ID_KEY, conversationId))
                 .stream()
                 .content()
                 .map(response -> ChatMessageVo.builder().
@@ -59,8 +62,9 @@ public class RagService {
         return documents.stream().map(Document::getId).toList();
     }
 
-
     public void delDocumentsFromEsRag(List<String> documentRagIds) {
-        vectorStore.delete(documentRagIds);
+        if (CollectionUtils.isNotEmpty(documentRagIds)) {
+            vectorStore.delete(documentRagIds);
+        }
     }
 }

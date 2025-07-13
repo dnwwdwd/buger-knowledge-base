@@ -1,17 +1,20 @@
 package com.hjj.knowledgebase.service.impl;
 
+import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.extra.cglib.CglibUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.hjj.knowledgebase.mapper.ChatConversationMapper;
 import com.hjj.knowledgebase.model.dto.chatconversation.ChatConversationDto;
 import com.hjj.knowledgebase.model.entity.ChatConversation;
 import com.hjj.knowledgebase.model.entity.ChatMessage;
 import com.hjj.knowledgebase.model.vo.ChatConversationVo;
 import com.hjj.knowledgebase.service.ChatConversationService;
-import com.hjj.knowledgebase.mapper.ChatConversationMapper;
 import com.hjj.knowledgebase.service.ChatMessageService;
 import com.hjj.knowledgebase.service.UserService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,13 +35,23 @@ public class ChatConversationServiceImpl extends ServiceImpl<ChatConversationMap
     private ChatMessageService chatMessageService;
 
     @Override
-    public Long add(ChatConversationDto dto, HttpServletRequest request) {
-        Long userId = userService.getLoginUser(request).getId();
+    public Long add(ChatConversationDto dto) {
         ChatConversation chatConversation = new ChatConversation();
-        chatConversation.setCreateBy(userId);
+        chatConversation.setCreateBy(StpUtil.getLoginIdAsLong());
         chatConversation.setName(dto.getName());
         this.save(chatConversation);
         return chatConversation.getId();
+    }
+
+    @Override
+    public Boolean deleteByIds(List<Long> ids) {
+        if (CollectionUtils.isEmpty(ids)) {
+            return true;
+        }
+        boolean b1 = this.removeByIds(ids);
+        LambdaQueryWrapper<ChatMessage> wrapper = new LambdaQueryWrapper<>();
+        wrapper.in(ChatMessage::getConversationId, ids);
+        return chatMessageService.remove(wrapper) && b1;
     }
 
     public List<ChatConversationVo> list(HttpServletRequest request) {

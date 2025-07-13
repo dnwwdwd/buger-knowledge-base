@@ -17,6 +17,4 @@ public class ChatMessageVo implements Serializable {
 
     private String content;
 
-    private String role;
-
 }
